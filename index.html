@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
+<title>Estudo Fácil — Assistente de Estudos por Voz</title>
+<meta name="description" content="Assistente de estudos por voz para História: fale, transcreva, edite, exporte e compartilhe.">
+
+<!-- PWA / iOS -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#12181F">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Estudo Fácil">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/icon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="icons/icon-16.png">
+
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- ===================== CABEÇALHO ===================== -->
+<header class="app-header">
+  <div class="app-header__mark" aria-hidden="true">
+    <svg viewBox="0 0 24 24" width="22" height="22">
+      <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.4"/>
+      <path d="M12 5.2 L14.6 12 L12 18.8 L9.4 12 Z" fill="currentColor"/>
+    </svg>
+  </div>
+  <h1 class="app-header__title">Estudo Fácil</h1>
+  <button id="btn-status" class="app-header__status" type="button" aria-label="Status de conexão e armazenamento">
+    <span id="status-dot" class="status-dot"></span>
+  </button>
+</header>
+
+<!-- ===================== CONTEÚDO ===================== -->
+<main id="main">
+
+  <!-- ---------- VIEW: FALAR / EDITOR (Falar e Novo texto) ---------- -->
+  <section class="view" id="view-editor" data-view="editor">
+    <div class="editor-topbar">
+      <input id="doc-titulo" class="editor-title-input" type="text" placeholder="Título do texto" maxlength="120" autocomplete="off">
+      <span id="doc-tema-chip" class="tema-chip hidden"></span>
+    </div>
+
+    <div class="mic-zone">
+      <button id="btn-mic" class="mic-button" type="button" aria-pressed="false" aria-label="Falar">
+        <span class="mic-pulse mic-pulse--1"></span>
+        <span class="mic-pulse mic-pulse--2"></span>
+        <svg class="mic-icon" viewBox="0 0 24 24" width="30" height="30" aria-hidden="true">
+          <path d="M12 15a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3Z" fill="currentColor"/>
+          <path d="M19 11a7 7 0 0 1-14 0" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+          <path d="M12 18v3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+        </svg>
+      </button>
+      <p id="mic-status" class="mic-status">Toque no microfone e fale naturalmente</p>
+    </div>
+
+    <div class="page-wrap">
+      <textarea id="transcript"
+           class="page"
+           aria-label="Texto transcrito, editável"
+           placeholder="Seu texto aparecerá aqui enquanto você fala. Você também pode digitar ou colar um texto."></textarea>
+    </div>
+
+    <div class="editor-meta">
+      <span id="word-count">0 palavras</span>
+      <span id="save-indicator" class="save-indicator"></span>
+    </div>
+
+    <div class="editor-toolbar">
+      <button id="btn-limpar" class="tbtn tbtn--ghost" type="button">Limpar</button>
+      <button id="btn-salvar" class="tbtn tbtn--primary" type="button">Salvar</button>
+      <div class="tbtn-menu-wrap">
+        <button id="btn-exportar" class="tbtn tbtn--ghost" type="button" aria-haspopup="true" aria-expanded="false">Exportar ▾</button>
+        <div id="export-menu" class="export-menu hidden" role="menu">
+          <button class="export-menu__item" data-export="docx" role="menuitem">📄 Word (.docx)</button>
+          <button class="export-menu__item" data-export="pdf" role="menuitem">🧾 PDF (.pdf)</button>
+          <button class="export-menu__item" data-export="txt" role="menuitem">✒️ Texto (.txt)</button>
+        </div>
+      </div>
+      <button id="btn-share-editor" class="tbtn tbtn--icon" type="button" aria-label="Compartilhar">
+        <svg viewBox="0 0 24 24" width="20" height="20"><path d="M12 3v12M12 3l-4 4M12 3l4 4M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+  </section>
+
+  <!-- ---------- VIEW: ESTUDOS DE HISTÓRIA ---------- -->
+  <section class="view hidden" id="view-estudos" data-view="estudos">
+    <h2 class="view-title">📚 Estudos de História</h2>
+    <p class="view-subtitle">Técnicas rápidas de estudo e temas para começar um texto novo.</p>
+
+    <h3 class="section-label">Técnicas de estudo</h3>
+    <div id="lista-tecnicas" class="accordion"></div>
+
+    <h3 class="section-label">Temas de História</h3>
+    <p class="section-hint">Toque em um tema para começar a falar sobre ele.</p>
+    <div id="lista-temas" class="chip-grid"></div>
+  </section>
+
+  <!-- ---------- VIEW: MEUS ARQUIVOS ---------- -->
+  <section class="view hidden" id="view-arquivos" data-view="arquivos">
+    <h2 class="view-title">📂 Meus arquivos</h2>
+    <input id="busca-arquivos" class="search-input" type="search" placeholder="Buscar por título ou tema…" autocomplete="off">
+    <div id="lista-arquivos" class="doc-list"></div>
+    <p id="arquivos-vazio" class="empty-state hidden">
+      Nenhum texto por aqui ainda.<br>Toque em 🎙️ Falar para começar.
+    </p>
+  </section>
+
+  <!-- ---------- VIEW: COMPARTILHAR ---------- -->
+  <section class="view hidden" id="view-compartilhar" data-view="compartilhar">
+    <h2 class="view-title">📤 Compartilhar</h2>
+    <p class="view-subtitle">Escolha um texto e envie para onde quiser: Mensagens, e-mail, AirDrop, Word, iCloud…</p>
+    <div id="lista-compartilhar" class="doc-list"></div>
+    <p id="compartilhar-vazio" class="empty-state hidden">
+      Nenhum texto salvo ainda para compartilhar.
+    </p>
+  </section>
+
+</main>
+
+<!-- ===================== TAB BAR ===================== -->
+<nav class="tabbar" aria-label="Navegação principal">
+  <button class="tab" data-nav="novo" type="button" aria-label="Novo texto">
+    <svg viewBox="0 0 24 24" width="22" height="22"><path d="M4 20h4.2L18 10.2a1.5 1.5 0 0 0 0-2.1l-2.1-2.1a1.5 1.5 0 0 0-2.1 0L4 15.8V20Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+    <span>Novo</span>
+  </button>
+  <button class="tab" data-nav="estudos" type="button" aria-label="Estudos de História">
+    <svg viewBox="0 0 24 24" width="22" height="22"><path d="M4 5.5C6 4.5 9 4.5 12 6c3-1.5 6-1.5 8-.5v13c-2-1-5-1-8 .5-3-1.5-6-1.5-8-.5Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M12 6v13" stroke="currentColor" stroke-width="1.5"/></svg>
+    <span>Estudos</span>
+  </button>
+  <button class="tab tab--fab" data-nav="falar" type="button" aria-label="Falar">
+    <span class="tab-fab-circle">
+      <svg viewBox="0 0 24 24" width="24" height="24"><path d="M12 15a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3Z" fill="currentColor"/><path d="M19 11a7 7 0 0 1-14 0" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+    </span>
+    <span>Falar</span>
+  </button>
+  <button class="tab" data-nav="arquivos" type="button" aria-label="Meus arquivos">
+    <svg viewBox="0 0 24 24" width="22" height="22"><path d="M3 7.5C3 6.7 3.7 6 4.5 6h4l1.5 2h9c.8 0 1.5.7 1.5 1.5v9c0 .8-.7 1.5-1.5 1.5h-15C3.7 20 3 19.3 3 18.5Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+    <span>Arquivos</span>
+  </button>
+  <button class="tab" data-nav="compartilhar" type="button" aria-label="Compartilhar">
+    <svg viewBox="0 0 24 24" width="22" height="22"><circle cx="6" cy="12" r="2.1" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="18" cy="6" r="2.1" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="18" cy="18" r="2.1" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M7.8 11 16.2 7M7.8 13l8.4 4" stroke="currentColor" stroke-width="1.5"/></svg>
+    <span>Enviar</span>
+  </button>
+</nav>
+
+<!-- ===================== TOAST ===================== -->
+<div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
+
+<!-- ===================== MODAL GENÉRICO ===================== -->
+<div id="modal-backdrop" class="modal-backdrop hidden">
+  <div class="modal" role="dialog" aria-modal="true">
+    <p id="modal-msg" class="modal__msg"></p>
+    <div id="modal-actions" class="modal__actions"></div>
+  </div>
+</div>
+
+<!-- ===================== BIBLIOTECAS (exportação) ===================== -->
+<script src="https://cdn.jsdelivr.net/npm/html-docx-js@0.3.1/dist/html-docx.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
+
+<!-- ===================== APP ===================== -->
+<script src="js/db.js" defer></script>
+<script src="js/textCleanup.js" defer></script>
+<script src="js/speech.js" defer></script>
+<script src="js/export.js" defer></script>
+<script src="js/app.js" defer></script>
+</body>
+</html>

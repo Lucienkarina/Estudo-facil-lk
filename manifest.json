@@ -1,0 +1,21 @@
+{
+  "name": "Estudo Fácil — Assistente de Estudos por Voz",
+  "short_name": "Estudo Fácil",
+  "description": "Assistente de estudos por voz para História: fale, transcreva, edite, exporte e compartilhe.",
+  "id": "/estudo-facil/",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#12181F",
+  "theme_color": "#12181F",
+  "lang": "pt-BR",
+  "dir": "ltr",
+  "categories": ["education", "productivity", "utilities"],
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
+    { "src": "icons/icon-180.png", "sizes": "180x180", "type": "image/png", "purpose": "any" }
+  ]
+}
